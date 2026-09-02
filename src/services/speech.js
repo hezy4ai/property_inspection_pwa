@@ -1,6 +1,6 @@
 /**
  * Speech-to-Text Voice Dictation Helper using Native Web Speech API
- * Designed for push-to-talk deficiency logging in field environments.
+ * Optimized for Mobile (Android Chrome / iOS Safari) and Desktop browsers.
  */
 
 export function isSpeechRecognitionSupported() {
@@ -19,30 +19,33 @@ export function createSpeechRecognizer({ onResult, onError, onEnd, lang = 'en-US
   recognition.interimResults = true;
   recognition.lang = lang;
 
-  recognition.onresult = (event) => {
-    let finalTranscript = '';
-    let interimTranscript = '';
+  // Session-level accumulator to prevent duplicate phrases across mobile resultIndex ticks
+  let accumulatedFinal = '';
 
-    // Loop through all results from index 0 to accumulate the full session transcript cleanly
-    for (let i = 0; i < event.results.length; ++i) {
-      const transcript = event.results[i][0].transcript;
-      if (event.results[i].isFinal) {
-        finalTranscript += transcript + ' ';
+  recognition.onresult = (event) => {
+    let currentInterim = '';
+
+    // Only iterate from event.resultIndex to process new items and avoid re-reading past chunks
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      const result = event.results[i];
+      if (result.isFinal) {
+        accumulatedFinal += result[0].transcript + ' ';
       } else {
-        interimTranscript += transcript;
+        currentInterim += result[0].transcript;
       }
     }
 
     if (onResult) {
       onResult({
-        final: finalTranscript.trim(),
-        interim: interimTranscript.trim()
+        final: accumulatedFinal.trim(),
+        interim: currentInterim.trim(),
+        full: [accumulatedFinal.trim(), currentInterim.trim()].filter(Boolean).join(' ')
       });
     }
   };
 
   recognition.onerror = (event) => {
-    console.warn('Speech recognition error:', event.error);
+    console.warn('[Speech Engine] Recognition error:', event.error);
     if (onError) {
       onError(event.error);
     }

@@ -163,6 +163,12 @@ export default function App() {
           onAddPhoto={handleAddPhoto}
           onDeletePhoto={handleDeletePhoto}
         />
+
+        {/* App Version & Build Footer */}
+        <footer className="pt-6 pb-2 text-center text-[11px] text-slate-500 font-mono space-y-1">
+          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.2</span> (Cache: v2)</div>
+          <div className="text-[10px] text-slate-600">Offline-First Mobile Field Inspection Engine</div>
+        </footer>
       </main>
 
       <div className="fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 p-4 safe-bottom z-30 shadow-2xl">
