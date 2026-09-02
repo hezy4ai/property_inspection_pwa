@@ -88,14 +88,15 @@ export async function processOutboxQueue(onStatusChange) {
 
         const datePrefix = new Date().toISOString().slice(0, 7);
 
+        // 1. Upload Defect Photos to Supabase Storage
         for (const photo of storedPhotos) {
           const fileExt = photo.mime_type.includes('png') ? 'png' : photo.mime_type.includes('jpeg') ? 'jpg' : 'webp';
-          const filePath = `${datePrefix}/${item.id}/${photo.id}.${fileExt}`;
+          const filePath = `photos/${datePrefix}/${item.id}/${photo.id}.${fileExt}`;
 
           const { error: uploadError } = await supabase.storage
             .from(STORAGE_BUCKET)
             .upload(filePath, photo.blob, {
-              contentType: photo.mime_type,
+              contentType: photo.mime_type || 'image/webp',
               upsert: true
             });
 
@@ -117,6 +118,43 @@ export async function processOutboxQueue(onStatusChange) {
           photo_urls: (def.photo_ids || []).map(id => photoMap.get(id)).filter(Boolean)
         }));
 
+        // 2. Generate PDF Report In-Memory (Dynamic Lazy Import)
+        let generatedPdfUrl = null;
+        try {
+          const { generateInspectionPdfBlob } = await import('./pdfReport.jsx');
+          const pdfPayload = {
+            id: item.id,
+            estate_name: item.payload.estate_name,
+            unit_number: item.payload.unit_number,
+            inspector_name: item.payload.inspector_name,
+            inspection_date: item.payload.inspection_date || new Date().toISOString().split('T')[0],
+            status: 'COMPLETED',
+            deficiencies: enrichedDeficiencies
+          };
+
+          const pdfBlob = await generateInspectionPdfBlob(pdfPayload);
+          const pdfFilePath = `reports/${datePrefix}/${item.id}.pdf`;
+
+          const { error: pdfUploadError } = await supabase.storage
+            .from(STORAGE_BUCKET)
+            .upload(pdfFilePath, pdfBlob, {
+              contentType: 'application/pdf',
+              upsert: true
+            });
+
+          if (!pdfUploadError) {
+            const { data: pdfUrlData } = supabase.storage
+              .from(STORAGE_BUCKET)
+              .getPublicUrl(pdfFilePath);
+            generatedPdfUrl = pdfUrlData?.publicUrl || pdfFilePath;
+          } else {
+            console.warn('[Sync Engine] PDF upload warning:', pdfUploadError.message);
+          }
+        } catch (pdfErr) {
+          console.error('[Sync Engine] PDF generation error:', pdfErr);
+        }
+
+        // 3. Atomic Database Upsert with pdf_url pre-populated
         const insertPayload = {
           id: item.id, // Client-generated UUID guarantees idempotency
           estate_name: item.payload.estate_name,
@@ -126,39 +164,26 @@ export async function processOutboxQueue(onStatusChange) {
           status: 'COMPLETED',
           deficiencies: enrichedDeficiencies,
           photo_urls: uploadedPhotoUrls,
+          pdf_url: generatedPdfUrl,
           metadata: {
-            app_version: '1.0.0',
+            app_version: '1.0.5',
             synced_at: new Date().toISOString(),
             offline_queued_at: item.created_at
           }
         };
 
-        // Upsert guarantees no duplicate records even if network retries multiple times
-        const { data: insertedRecord, error: dbError } = await supabase
+        const { error: dbError } = await supabase
           .from(INSPECTIONS_TABLE)
-          .upsert(insertPayload, { onConflict: 'id' })
-          .select()
-          .single();
+          .upsert(insertPayload, { onConflict: 'id' });
 
         if (dbError) {
           console.warn('[Sync Engine] Supabase database insert note:', dbError.message);
         }
 
-        const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL;
-        if (webhookUrl) {
-          fetch(webhookUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              inspection_id: insertedRecord?.id || item.id,
-              ...insertPayload
-            })
-          }).catch(webhookErr => console.warn('[Sync Engine] n8n Webhook trigger warning:', webhookErr));
-        }
-
         await db.outboxQueue.update(item.id, {
           status: 'SYNCED',
-          synced_at: new Date().toISOString()
+          synced_at: new Date().toISOString(),
+          pdf_url: generatedPdfUrl
         });
 
       } catch (itemError) {

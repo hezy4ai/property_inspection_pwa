@@ -1,0 +1,40 @@
+# Walkthrough: Client-Side PDF Generation & Atomic Storage Sync
+
+We have completed the implementation of the **Client-Side PDF Generation Pipeline** using `@react-pdf/renderer` with on-demand code splitting and atomic Supabase storage sync.
+
+---
+
+## Changes Implemented
+
+### 1. Dedicated PDF Report Generator ([`src/services/pdfReport.jsx`](file:///c:/property_pwa/src/services/pdfReport.jsx))
+* Built a branded A4 PDF document template using `@react-pdf/renderer`.
+* **Header:** InspectPWA branding, Estate Name, Unit Number, Inspector, and Date.
+* **Executive Summary:** Quick-reference count grid for Total Defects, Critical (Red), Moderate (Amber), and Minor (Blue).
+* **Deficiencies Punch-List:** Dynamic mapping with `wrap={false}` on cards to ensure clean multi-page pagination without awkward card splits.
+* **Photo References:** Clickable links (`<Link src={photoUrl}>`) directly to high-res inspection photos in Supabase Storage.
+* **Export Helper:** `generateInspectionPdfBlob(data)` to compile binary `application/pdf` blobs in-memory.
+
+### 2. Submission Pipeline & Storage Sync ([`src/services/submission.js`](file:///c:/property_pwa/src/services/submission.js))
+* **Photo Uploads:** Uploaded to `/photos/{YYYY-MM}/{id}/{photo_id}.webp`.
+* **Dynamic Code-Splitting:** Dynamically loads the PDF engine (`await import('./pdfReport.jsx')`) on submission.
+* **PDF Upload:** Generates and uploads PDF blob to `/reports/{YYYY-MM}/{id}.pdf` with `contentType: 'application/pdf'`.
+* **Atomic PostgreSQL Insert:** Inserts row into `property_inspections` with `pdf_url` populated on row #1.
+
+### 3. User Interface Enhancements ([`src/App.jsx`](file:///c:/property_pwa/src/App.jsx) & [`src/components/SyncBanner.jsx`](file:///c:/property_pwa/src/components/SyncBanner.jsx))
+* **Success Modal:** Prominently displays a **"📄 View / Download PDF Report"** button to open the live generated PDF in a new tab.
+* **Version Bump:** Bumped to **`v1.0.5` (Cache: `v5`)** across the UI badge, bottom footer, Service Worker, and `index.html`.
+
+---
+
+## Build & Code-Splitting Verification
+
+Vite production build completed with 0 errors:
+```
+dist/index.html                        1.62 kB │ gzip:   0.77 kB
+dist/assets/index-C6DDU0-H.css        22.56 kB │ gzip:   4.70 kB
+dist/assets/index-DKeV1wNY.js        509.10 kB │ gzip: 150.09 kB  <-- Main PWA App Shell
+dist/assets/pdfReport-DHdoEtGK.js  1,252.23 kB │ gzip: 458.46 kB  <-- Lazy Loaded PDF Engine
+```
+
+> [!NOTE]
+> The initial PWA app shell loaded by mobile devices remains lightweight (150 KB gzip). The PDF engine is only downloaded when submitting an inspection.
