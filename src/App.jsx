@@ -166,8 +166,8 @@ export default function App() {
 
         {/* App Version & Build Footer */}
         <footer className="pt-6 pb-2 text-center text-[11px] text-slate-500 font-mono space-y-1">
-          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.4</span> (Cache: v4)</div>
-          <div className="text-[10px] text-slate-600">Offline-First Mobile Field Inspection Engine</div>
+          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.5</span> (Cache: v5)</div>
+          <div className="text-[10px] text-slate-600">Client-Side PDF Engine & Offline-First Sync</div>
         </footer>
       </main>
 
@@ -186,7 +186,7 @@ export default function App() {
             {isSubmitting ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
-                <span>Queueing Inspection...</span>
+                <span>Processing & Generating PDF...</span>
               </>
             ) : (
               <>
@@ -206,31 +206,47 @@ export default function App() {
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-white">Inspection Logged</h3>
+              <h3 className="text-lg font-bold text-white">Inspection Submitted!</h3>
               <p className="text-xs text-slate-400 mt-1">
                 {isOnline 
-                  ? 'Inspection queued and syncing to Supabase. PDF report is generating via n8n.' 
-                  : 'Inspection saved safely to local IndexedDB. It will automatically sync once network is restored.'}
+                  ? 'All photos and the official PDF certificate have been compiled and synced to Supabase.' 
+                  : 'Inspection saved safely to local IndexedDB. Photos and PDF will sync automatically once network is restored.'}
               </p>
             </div>
 
-            <div className="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 text-left text-xs space-y-1">
+            <div className="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 text-left text-xs space-y-1.5">
               <div className="flex justify-between text-slate-400">
                 <span>Inspection ID:</span>
-                <span className="font-mono text-slate-200">{lastSubmittedId?.slice(0, 16)}...</span>
+                <span className="font-mono text-slate-200">{lastSubmittedId?.slice(0, 14)}...</span>
               </div>
               <div className="flex justify-between text-slate-400">
-                <span>Storage Status:</span>
-                <span className="text-emerald-400 font-medium">Committed to Local DB</span>
+                <span>PDF Status:</span>
+                <span className="text-emerald-400 font-semibold">Generated & Hosted</span>
               </div>
             </div>
 
-            <button
-              onClick={() => setShowSuccessModal(false)}
-              className="w-full py-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs shadow-md shadow-sky-600/20 transition-all"
-            >
-              Start Next Inspection
-            </button>
+            <div className="space-y-2 pt-1">
+              <button
+                type="button"
+                onClick={async () => {
+                  const item = await db.outboxQueue.get(lastSubmittedId);
+                  const datePrefix = new Date().toISOString().slice(0, 7);
+                  const directPdfUrl = item?.pdf_url || `https://${import.meta.env.VITE_SUPABASE_URL?.replace('https://', '')}/storage/v1/object/public/inspection-photos/reports/${datePrefix}/${lastSubmittedId}.pdf`;
+                  window.open(directPdfUrl, '_blank');
+                }}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white font-semibold text-xs shadow-md shadow-sky-600/30 flex items-center justify-center gap-1.5 transition-all"
+              >
+                <span>📄 View / Download PDF Report</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowSuccessModal(false)}
+                className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-all"
+              >
+                Start Next Inspection
+              </button>
+            </div>
           </div>
         </div>
       )}
