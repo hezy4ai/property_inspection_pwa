@@ -55,9 +55,11 @@ export default function PunchList({ deficiencies = [], onChange, photoMap = {}, 
       try {
         const recognizer = createSpeechRecognizer({
           onResult: ({ full }) => {
-            if (full) {
-              const prefix = initialTextRef.current ? `${initialTextRef.current} ` : '';
-              setDescription(`${prefix}${full}`);
+            const base = initialTextRef.current;
+            if (base && full) {
+              setDescription(`${base} ${full}`);
+            } else if (full) {
+              setDescription(full);
             }
           },
           onError: (err) => {

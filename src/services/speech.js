@@ -1,6 +1,6 @@
 /**
  * Speech-to-Text Voice Dictation Helper using Native Web Speech API
- * Optimized for Mobile (Android Chrome / iOS Safari) and Desktop browsers.
+ * Robust single-stream engine for Mobile (Android Chrome / iOS Safari) and Desktop.
  */
 
 export function isSpeechRecognitionSupported() {
@@ -19,27 +19,27 @@ export function createSpeechRecognizer({ onResult, onError, onEnd, lang = 'en-US
   recognition.interimResults = true;
   recognition.lang = lang;
 
-  // Session-level accumulator to prevent duplicate phrases across mobile resultIndex ticks
-  let accumulatedFinal = '';
-
   recognition.onresult = (event) => {
-    let currentInterim = '';
+    let finalTranscript = '';
+    let interimTranscript = '';
 
-    // Only iterate from event.resultIndex to process new items and avoid re-reading past chunks
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      const result = event.results[i];
-      if (result.isFinal) {
-        accumulatedFinal += result[0].transcript + ' ';
+    // Reconstruct the exact live transcript from event.results on every tick
+    for (let i = 0; i < event.results.length; ++i) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalTranscript += transcript + ' ';
       } else {
-        currentInterim += result[0].transcript;
+        interimTranscript += transcript;
       }
     }
 
+    const liveText = (finalTranscript + interimTranscript).trim();
+
     if (onResult) {
       onResult({
-        final: accumulatedFinal.trim(),
-        interim: currentInterim.trim(),
-        full: [accumulatedFinal.trim(), currentInterim.trim()].filter(Boolean).join(' ')
+        final: finalTranscript.trim(),
+        interim: interimTranscript.trim(),
+        full: liveText
       });
     }
   };

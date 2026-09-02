@@ -1,4 +1,4 @@
-const CACHE_NAME = 'property-inspection-pwa-v2';
+const CACHE_NAME = 'property-inspection-pwa-v3';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
