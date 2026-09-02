@@ -166,7 +166,7 @@ export default function App() {
 
         {/* App Version & Build Footer */}
         <footer className="pt-6 pb-2 text-center text-[11px] text-slate-500 font-mono space-y-1">
-          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.3</span> (Cache: v3)</div>
+          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.4</span> (Cache: v4)</div>
           <div className="text-[10px] text-slate-600">Offline-First Mobile Field Inspection Engine</div>
         </footer>
       </main>

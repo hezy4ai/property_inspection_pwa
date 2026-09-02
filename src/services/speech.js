@@ -1,6 +1,6 @@
 /**
- * Speech-to-Text Voice Dictation Helper using Native Web Speech API
- * Robust single-stream engine for Mobile (Android Chrome / iOS Safari) and Desktop.
+ * Mobile-Safe Speech-to-Text Voice Dictation Helper using Web Speech API
+ * Configured specifically for Android Chrome and iOS Safari to prevent phrase repetition.
  */
 
 export function isSpeechRecognitionSupported() {
@@ -15,32 +15,29 @@ export function createSpeechRecognizer({ onResult, onError, onEnd, lang = 'en-US
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = new SpeechRecognition();
 
-  recognition.continuous = true;
-  recognition.interimResults = true;
+  // Mobile-safe settings: disable interim results to eliminate Android Chrome repetition loop
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
   recognition.lang = lang;
 
   recognition.onresult = (event) => {
-    let finalTranscript = '';
-    let interimTranscript = '';
+    let finalChunk = '';
 
-    // Reconstruct the exact live transcript from event.results on every tick
-    for (let i = 0; i < event.results.length; ++i) {
-      const transcript = event.results[i][0].transcript;
-      if (event.results[i].isFinal) {
-        finalTranscript += transcript + ' ';
-      } else {
-        interimTranscript += transcript;
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const result = event.results[i];
+      
+      // Android Chrome workaround: filter out false "final" results with 0 confidence
+      const isActuallyFinal = result.isFinal && (result[0].confidence > 0 || result[0].confidence === undefined);
+
+      if (isActuallyFinal) {
+        finalChunk += result[0].transcript + ' ';
       }
     }
 
-    const liveText = (finalTranscript + interimTranscript).trim();
-
-    if (onResult) {
-      onResult({
-        final: finalTranscript.trim(),
-        interim: interimTranscript.trim(),
-        full: liveText
-      });
+    const cleanText = finalChunk.trim();
+    if (cleanText && onResult) {
+      onResult(cleanText);
     }
   };
 
