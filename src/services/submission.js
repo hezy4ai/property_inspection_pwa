@@ -43,6 +43,13 @@ export async function queueInspectionForSubmission(inspectionData, photoBlobs = 
     status: 'PENDING',
     retry_count: 0,
     created_at: new Date().toISOString(),
+    estate_name: inspectionData.estate_name || '',
+    unit_number: inspectionData.unit_number || '',
+    inspector_name: inspectionData.inspector_name || '',
+    inspection_date: inspectionData.inspection_date || new Date().toISOString().split('T')[0],
+    deficiencies_count: (inspectionData.deficiencies || []).length,
+    photos_count: photoBlobs.length,
+    pdf_url: null,
     payload: {
       ...inspectionData,
       id: inspectionId,

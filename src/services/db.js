@@ -71,3 +71,13 @@ export async function getPhotoBlob(id) {
 export async function deletePhotoBlob(id) {
   await db.photoBlobs.delete(id);
 }
+
+export async function getAllOutboxItems() {
+  const items = await db.outboxQueue.toArray();
+  // Sort newest first
+  return items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+}
+
+export async function getOutboxItem(id) {
+  return await db.outboxQueue.get(id);
+}
