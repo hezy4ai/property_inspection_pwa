@@ -251,7 +251,7 @@ export default function App() {
 
         {/* App Version & Build Footer */}
         <footer className="pt-6 pb-2 text-center text-[11px] text-slate-500 font-mono space-y-1">
-          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.7</span> (Cache: v7)</div>
+          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.8</span> (Cache: v8)</div>
           <div className="text-[10px] text-slate-600">Flybird Outbox & Direct Mobile PDF Downloader</div>
         </footer>
       </main>
