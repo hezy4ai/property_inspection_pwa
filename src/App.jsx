@@ -11,6 +11,7 @@ import {
   processOutboxQueue, 
   getPendingQueueCount 
 } from './services/submission.js';
+import { downloadPdfToDevice, shareOrOpenPdf } from './services/pdfDownloader.js';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('new'); // 'new' | 'outbox'
@@ -250,8 +251,8 @@ export default function App() {
 
         {/* App Version & Build Footer */}
         <footer className="pt-6 pb-2 text-center text-[11px] text-slate-500 font-mono space-y-1">
-          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.6</span> (Cache: v6)</div>
-          <div className="text-[10px] text-slate-600">Flybird Outbox & Client-Side PDF Generation Engine</div>
+          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.7</span> (Cache: v7)</div>
+          <div className="text-[10px] text-slate-600">Flybird Outbox & Direct Mobile PDF Downloader</div>
         </footer>
       </main>
 
@@ -336,14 +337,23 @@ export default function App() {
 
             <div className="space-y-2 pt-1">
               {lastSubmittedPdfUrl && (
-                <a
-                  href={lastSubmittedPdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white font-semibold text-xs shadow-md shadow-sky-600/30 flex items-center justify-center gap-1.5 transition-all"
-                >
-                  <span>📄 View / Download PDF Report</span>
-                </a>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => downloadPdfToDevice(lastSubmittedPdfUrl, `Inspection_${lastSubmittedId}`)}
+                    className="py-3 px-2 rounded-xl bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white font-semibold text-xs shadow-md shadow-sky-600/30 flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    <span>↓ Download PDF</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => shareOrOpenPdf(lastSubmittedPdfUrl, 'Inspection Report')}
+                    className="py-3 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 hover:text-sky-200 font-semibold text-xs border border-sky-500/30 flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    <span>Share / Print</span>
+                  </button>
+                </div>
               )}
 
               <button
