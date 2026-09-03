@@ -1,7 +1,27 @@
-import React from 'react';
-import { Database, CheckCircle2, Clock, RefreshCw, FileText, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { Database, CheckCircle2, Clock, RefreshCw, FileText, Download, Share2 } from 'lucide-react';
+import { downloadPdfToDevice, shareOrOpenPdf } from '../services/pdfDownloader.js';
 
 export default function OutboxList({ outboxItems = [], isOnline, isSyncing, onManualSync }) {
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  const handleDownload = async (item) => {
+    if (!item.pdf_url) return;
+    setDownloadingId(item.id);
+    const safeName = `Inspection_${(item.estate_name || 'Property').replace(/\s+/g, '_')}_${(item.unit_number || 'Unit').replace(/\s+/g, '_')}`;
+    try {
+      await downloadPdfToDevice(item.pdf_url, safeName);
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
+  const handleShare = async (item) => {
+    if (!item.pdf_url) return;
+    const title = `${item.estate_name || 'Property'} ${item.unit_number || ''}`;
+    await shareOrOpenPdf(item.pdf_url, title);
+  };
+
   return (
     <div className="space-y-4">
       {/* On-device Storage Banner (Flybird Reference Style) */}
@@ -20,7 +40,7 @@ export default function OutboxList({ outboxItems = [], isOnline, isSyncing, onMa
           </div>
           <h3 className="text-sm font-semibold text-slate-300">Outbox is empty</h3>
           <p className="text-xs text-slate-500 max-w-xs mx-auto">
-            Completed inspections will be saved here locally on your device with instant access to generated PDF reports.
+            Completed inspections will be saved here locally on your device with instant 1-click download and share actions.
           </p>
         </div>
       ) : (
@@ -30,7 +50,8 @@ export default function OutboxList({ outboxItems = [], isOnline, isSyncing, onMa
             const isUploading = item.status === 'UPLOADING';
             const defectsCount = item.deficiencies_count ?? item.payload?.deficiencies?.length ?? 0;
             const photosCount = item.photos_count ?? item.payload?.deficiencies?.reduce((acc, d) => acc + (d.photo_ids?.length || 0), 0) ?? 0;
-            
+            const isDownloading = downloadingId === item.id;
+
             // Format created date nicely
             const dateStr = item.created_at 
               ? new Date(item.created_at).toLocaleString(undefined, {
@@ -99,18 +120,39 @@ export default function OutboxList({ outboxItems = [], isOnline, isSyncing, onMa
                   </div>
                 </div>
 
-                {/* Action Button: Download Copy */}
-                <div className="pt-1">
+                {/* Action Buttons: Direct Mobile Download & Native Share */}
+                <div className="pt-1 flex items-center gap-2 flex-wrap">
                   {item.pdf_url ? (
-                    <a
-                      href={item.pdf_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700/80 active:scale-[0.98] border border-slate-700/60 text-slate-200 hover:text-white font-semibold text-xs transition-all shadow-sm"
-                    >
-                      <Download className="w-3.5 h-3.5 text-sky-400" />
-                      <span>↓ Download copy</span>
-                    </a>
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleDownload(item)}
+                        disabled={isDownloading}
+                        className="flex-1 min-w-[130px] inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700/80 active:scale-[0.98] border border-slate-700/60 text-slate-200 hover:text-white font-semibold text-xs transition-all shadow-sm disabled:opacity-50"
+                      >
+                        {isDownloading ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin text-sky-400" />
+                            <span>Saving file...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Download className="w-3.5 h-3.5 text-sky-400" />
+                            <span>↓ Download copy</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleShare(item)}
+                        className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 active:scale-[0.98] border border-sky-500/20 text-sky-300 hover:text-sky-200 font-semibold text-xs transition-all"
+                        title="Share PDF or Print"
+                      >
+                        <Share2 className="w-3.5 h-3.5" />
+                        <span>Share / Print</span>
+                      </button>
+                    </>
                   ) : (
                     <button
                       disabled
