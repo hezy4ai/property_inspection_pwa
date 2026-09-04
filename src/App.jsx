@@ -4,7 +4,7 @@ import SyncBanner from './components/SyncBanner.jsx';
 import MetadataForm from './components/MetadataForm.jsx';
 import PunchList from './components/PunchList.jsx';
 import OutboxList from './components/OutboxList.jsx';
-import { loadActiveDraft, saveDraft, getAllOutboxItems, getOutboxItem } from './services/db.js';
+import { loadActiveDraft, saveDraft, getAllOutboxItems, getOutboxItem, clearActiveDraft } from './services/db.js';
 import { getWatDateString } from './utils/date.js';
 import { 
   initAutoSyncListener, 
@@ -25,6 +25,7 @@ export default function App() {
   });
 
   const [deficiencies, setDeficiencies] = useState([]);
+  const [activeDefect, setActiveDefect] = useState(null);
   const [photosList, setPhotosList] = useState([]);
   const [photoMap, setPhotoMap] = useState({});
   const [outboxItems, setOutboxItems] = useState([]);
@@ -60,6 +61,9 @@ export default function App() {
           inspection_date: draft.inspection_date || getWatDateString()
         });
         setDeficiencies(draft.deficiencies || []);
+        if (draft.active_defect) {
+          setActiveDefect(draft.active_defect);
+        }
       }
 
       await refreshOutbox();
@@ -81,7 +85,8 @@ export default function App() {
       const timer = setTimeout(() => {
         saveDraft({
           ...metadata,
-          deficiencies
+          deficiencies,
+          active_defect: activeDefect
         }).then(() => setSaveStatus('saved'))
           .catch(err => {
             console.error('Error auto-saving draft to IndexedDB:', err);
@@ -90,7 +95,7 @@ export default function App() {
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [metadata, deficiencies, activeTab]);
+  }, [metadata, deficiencies, activeDefect, activeTab]);
 
   const handleAddPhoto = (photo) => {
     setPhotosList((prev) => [...prev, photo]);
@@ -149,6 +154,8 @@ export default function App() {
 
       await refreshOutbox();
 
+      await clearActiveDraft();
+      
       setMetadata({
         estate_name: '',
         unit_number: '',
@@ -156,6 +163,7 @@ export default function App() {
         inspection_date: getWatDateString()
       });
       setDeficiencies([]);
+      setActiveDefect(null);
       setPhotosList([]);
       setPhotoMap({});
       setShowSuccessModal(true);
@@ -243,6 +251,8 @@ export default function App() {
             <PunchList
               deficiencies={deficiencies}
               onChange={setDeficiencies}
+              activeDefect={activeDefect}
+              onActiveDefectChange={setActiveDefect}
               photoMap={photoMap}
               onAddPhoto={handleAddPhoto}
               onDeletePhoto={handleDeletePhoto}
@@ -262,7 +272,7 @@ export default function App() {
 
         {/* App Version & Build Footer */}
         <footer className="pt-6 pb-2 text-center text-[11px] text-slate-500 font-mono space-y-1">
-          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.9</span> (Cache: v9)</div>
+          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.10</span> (Cache: v10)</div>
           <div className="text-[10px] text-slate-600">Property Inspection Suite</div>
         </footer>
       </main>
