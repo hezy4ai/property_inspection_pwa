@@ -100,18 +100,18 @@ export default function CameraCapture({ photos = [], onAddPhoto, onDeletePhoto }
         <button
           type="button"
           onClick={handleOpenModal}
-          className="flex-1 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-white border border-slate-700 rounded-xl py-2.5 px-3 text-xs font-semibold shadow-sm transition-all"
+          className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-slate-50 active:scale-[0.98] text-app-text-primary border border-app-border rounded-xl py-2.5 px-3 text-xs font-semibold shadow-sm transition-all"
         >
-          <Camera className="w-4 h-4 text-sky-400" />
+          <Camera className="w-4 h-4 text-app-brand-primary" />
           <span>Take Photo</span>
         </button>
 
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center justify-center gap-1.5 bg-slate-800/60 hover:bg-slate-700/80 active:scale-[0.98] text-slate-300 border border-slate-700/80 rounded-xl py-2.5 px-3 text-xs font-medium transition-all"
+          className="flex items-center justify-center gap-1.5 bg-slate-50 hover:bg-slate-100 active:scale-[0.98] text-app-text-secondary border border-app-border rounded-xl py-2.5 px-3 text-xs font-medium transition-all"
         >
-          <Upload className="w-4 h-4 text-slate-400" />
+          <Upload className="w-4 h-4 text-app-text-secondary/80" />
           <span>Upload</span>
         </button>
         <input
@@ -130,7 +130,7 @@ export default function CameraCapture({ photos = [], onAddPhoto, onDeletePhoto }
           {photos.map((photo, index) => (
             <div
               key={photo.id || index}
-              className="relative group shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-slate-700 bg-slate-900 shadow-sm"
+              className="relative group shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-app-border bg-slate-100 shadow-sm"
             >
               <img
                 src={photo.previewUrl}

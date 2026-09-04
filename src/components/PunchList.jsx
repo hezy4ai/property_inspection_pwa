@@ -170,19 +170,19 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
 
   return (
     <div className="space-y-4">
-      <div className="bg-slate-800/90 backdrop-blur border border-slate-700/80 rounded-2xl p-4 shadow-sm space-y-3">
+      <div className="bg-app-card rounded-2xl border border-app-border p-4 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <Layers className="w-4 h-4 text-sky-400" />
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-app-text-secondary flex items-center gap-1.5">
+            <Layers className="w-4 h-4 text-app-brand-primary" />
             Log Deficiency #{deficiencies.length + 1}
           </h2>
-          <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-700/60 text-slate-300">
+          <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-white text-app-text-secondary border border-app-border">
             {deficiencies.length} items logged
           </span>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1.5">
+          <label className="block text-xs font-medium text-app-text-secondary mb-1.5">
             Area / Room Tag
           </label>
           <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-1">
@@ -193,8 +193,8 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
                 onClick={() => setSelectedArea(area)}
                 className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                   selectedArea === area
-                    ? 'bg-sky-600 text-white shadow-sm shadow-sky-500/20'
-                    : 'bg-slate-900/80 text-slate-300 hover:bg-slate-700 border border-slate-700/60'
+                    ? 'bg-app-brand-primary text-white shadow-sm shadow-app-brand-primary/20'
+                    : 'bg-white text-app-text-secondary hover:bg-slate-50 border border-app-border'
                 }`}
               >
                 {area}
@@ -205,8 +205,8 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
               onClick={() => setSelectedArea('Custom')}
               className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                 selectedArea === 'Custom'
-                  ? 'bg-sky-600 text-white'
-                  : 'bg-slate-900/80 text-slate-300 hover:bg-slate-700 border border-slate-700/60'
+                  ? 'bg-app-brand-primary text-white shadow-sm shadow-app-brand-primary/20'
+                  : 'bg-white text-app-text-secondary hover:bg-slate-50 border border-app-border'
               }`}
             >
               + Custom
@@ -219,13 +219,13 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
               placeholder="Enter custom room name (e.g. Utility Room)"
               value={customArea}
               onChange={(e) => setCustomArea(e.target.value)}
-              className="mt-2 w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-sky-500"
+              className="mt-2 w-full bg-white border border-app-border rounded-xl px-3 py-2 text-xs text-app-text-primary placeholder:text-app-text-secondary/60 outline-none focus:border-app-brand-primary focus:ring-1 focus:ring-app-brand-primary"
             />
           )}
         </div>
 
         <div className="flex items-center gap-2 pt-1">
-          <span className="text-xs text-slate-400">Severity:</span>
+          <span className="text-xs text-app-text-secondary">Severity:</span>
           {['MINOR', 'MODERATE', 'CRITICAL'].map((lvl) => (
             <button
               key={lvl}
@@ -234,11 +234,11 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
               className={`px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide transition-all ${
                 severity === lvl
                   ? lvl === 'CRITICAL'
-                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                    ? 'bg-app-status-critical/10 text-app-status-critical border border-app-status-critical/20'
                     : lvl === 'MODERATE'
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                    : 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
-                  : 'bg-slate-900/60 text-slate-400 border border-slate-800'
+                    ? 'bg-app-status-warning/10 text-app-status-warning border border-app-status-warning/20'
+                    : 'bg-app-status-minor/10 text-app-text-primary border border-app-status-minor/30'
+                  : 'bg-white text-app-text-secondary border border-app-border'
               }`}
             >
               {lvl}
@@ -248,7 +248,7 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
 
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-medium text-slate-300">
+            <label className="block text-xs font-medium text-app-text-secondary">
               Defect Observation Description
             </label>
             {speechSupported && (
@@ -257,11 +257,11 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
                 onClick={toggleVoiceDictation}
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
                   isRecording
-                    ? 'bg-rose-500 text-white animate-pulse shadow-md shadow-rose-500/30'
-                    : 'bg-slate-700 hover:bg-slate-600 text-slate-200'
+                    ? 'bg-app-status-critical text-white animate-pulse shadow-md shadow-app-status-critical/30'
+                    : 'bg-white border border-app-border hover:bg-slate-50 text-app-text-secondary'
                 }`}
               >
-                {isRecording ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5 text-sky-400" />}
+                {isRecording ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5 text-app-brand-primary" />}
                 <span>{isRecording ? 'Listening...' : 'Voice Dictate'}</span>
               </button>
             )}
@@ -272,7 +272,7 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
             placeholder="Dictate with mic or type observation (e.g., Hairline paint cracks along south ceiling cornice)..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl p-3 text-sm text-white placeholder-slate-500 outline-none resize-none transition-all"
+            className="w-full bg-white border border-app-border focus:border-app-brand-primary focus:ring-1 focus:ring-app-brand-primary rounded-xl p-3 text-sm text-app-text-primary placeholder:text-app-text-secondary/60 outline-none resize-none transition-all"
           />
         </div>
 
@@ -286,7 +286,7 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
           type="button"
           onClick={handleAddDeficiency}
           disabled={!description.trim()}
-          className="w-full flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-500 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-sky-600/20 text-sm transition-all"
+          className="w-full flex items-center justify-center gap-2 bg-app-brand-primary hover:bg-app-brand-primary/90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-app-brand-primary/20 text-sm transition-all"
         >
           <Plus className="w-4 h-4" />
           <span>Add Defect to Punch-List</span>
@@ -295,30 +295,30 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
 
       {deficiencies.length > 0 ? (
         <div className="space-y-2.5">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-1">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-app-text-secondary px-1">
             Logged Punch-List Items ({deficiencies.length})
           </h3>
 
           {deficiencies.map((item, index) => (
             <div
               key={item.id || index}
-              className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3 shadow-sm space-y-2"
+              className="bg-white border border-app-border rounded-xl p-3 shadow-sm space-y-2"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-md bg-sky-500/20 text-sky-400 font-bold text-xs flex items-center justify-center border border-sky-500/30">
+                  <span className="w-6 h-6 rounded-md bg-app-status-minor/10 text-app-text-primary font-bold text-xs flex items-center justify-center border border-app-status-minor/20">
                     #{item.item_number}
                   </span>
-                  <span className="text-xs font-semibold text-white px-2 py-0.5 rounded bg-slate-900/80 border border-slate-700">
+                  <span className="text-xs font-semibold text-app-text-primary px-2 py-0.5 rounded bg-white border border-app-border">
                     {item.area}
                   </span>
                   <span
                     className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                       item.severity === 'CRITICAL'
-                        ? 'bg-rose-500/20 text-rose-300'
+                        ? 'bg-app-status-critical/10 text-app-status-critical'
                         : item.severity === 'MODERATE'
-                        ? 'bg-amber-500/20 text-amber-300'
-                        : 'bg-sky-500/20 text-sky-300'
+                        ? 'bg-app-status-warning/10 text-app-status-warning'
+                        : 'bg-app-status-minor/10 text-app-text-primary'
                     }`}
                   >
                     {item.severity}
@@ -330,7 +330,7 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
                     type="button"
                     onClick={() => handleMoveItem(index, -1)}
                     disabled={index === 0}
-                    className="p-1 rounded text-slate-400 hover:text-white disabled:opacity-20"
+                    className="p-1 rounded text-app-text-secondary hover:text-app-brand-primary disabled:opacity-20"
                     title="Move Up"
                   >
                     <ChevronUp className="w-4 h-4" />
@@ -339,7 +339,7 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
                     type="button"
                     onClick={() => handleMoveItem(index, 1)}
                     disabled={index === deficiencies.length - 1}
-                    className="p-1 rounded text-slate-400 hover:text-white disabled:opacity-20"
+                    className="p-1 rounded text-app-text-secondary hover:text-app-brand-primary disabled:opacity-20"
                     title="Move Down"
                   >
                     <ChevronDown className="w-4 h-4" />
@@ -347,7 +347,7 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
                   <button
                     type="button"
                     onClick={() => handleDeleteItem(index)}
-                    className="p-1 rounded text-rose-400 hover:text-rose-300 ml-1"
+                    className="p-1 rounded text-app-status-critical/70 hover:text-app-status-critical ml-1"
                     title="Delete Item"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -359,7 +359,7 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
                 rows={2}
                 value={item.description}
                 onChange={(e) => handleDescriptionChange(index, e.target.value)}
-                className="w-full bg-slate-900/60 border border-slate-700/60 focus:border-sky-500 rounded-lg p-2 text-xs text-slate-200 outline-none resize-none transition-all"
+                className="w-full bg-white border border-app-border focus:border-app-brand-primary rounded-lg p-2 text-xs text-app-text-primary outline-none resize-none transition-all"
               />
 
               {item.photo_ids && item.photo_ids.length > 0 && (
@@ -372,7 +372,7 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
                         key={photoId}
                         src={photo.previewUrl}
                         alt="Defect"
-                        className="w-12 h-12 rounded-lg object-cover border border-slate-700"
+                        className="w-12 h-12 rounded-lg object-cover border border-app-border"
                       />
                     );
                   })}
@@ -382,10 +382,10 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
           ))}
         </div>
       ) : (
-        <div className="border border-dashed border-slate-700 rounded-2xl p-6 text-center space-y-2">
-          <AlertTriangle className="w-6 h-6 text-slate-500 mx-auto" />
-          <p className="text-xs text-slate-400">No punch-list defects logged yet.</p>
-          <p className="text-[11px] text-slate-500">
+        <div className="bg-white/50 border border-dashed border-app-border rounded-2xl p-6 text-center space-y-2">
+          <AlertTriangle className="w-6 h-6 text-app-text-secondary/60 mx-auto" />
+          <p className="text-xs text-app-text-secondary">No punch-list defects logged yet.</p>
+          <p className="text-[11px] text-app-text-secondary/80">
             Select a room tag, dictate or type your observation, and attach high-res photos above.
           </p>
         </div>
