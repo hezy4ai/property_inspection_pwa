@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Database, CheckCircle2, Clock, RefreshCw, FileText, Download, Share2 } from 'lucide-react';
 import { downloadPdfToDevice, shareOrOpenPdf } from '../services/pdfDownloader.js';
 
+import { formatWatDateTime } from '../utils/date.js';
+
 export default function OutboxList({ outboxItems = [], isOnline, isSyncing, onManualSync }) {
   const [downloadingId, setDownloadingId] = useState(null);
 
@@ -24,7 +26,7 @@ export default function OutboxList({ outboxItems = [], isOnline, isSyncing, onMa
 
   return (
     <div className="space-y-4">
-      {/* On-device Storage Banner (Flybird Reference Style) */}
+      {/* On-device Storage Banner (Reference Style) */}
       <div className="bg-amber-950/40 border border-amber-500/30 rounded-xl p-3 flex items-start gap-2.5 shadow-sm">
         <Database className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
         <p className="text-xs text-amber-200 leading-relaxed">
@@ -52,17 +54,9 @@ export default function OutboxList({ outboxItems = [], isOnline, isSyncing, onMa
             const photosCount = item.photos_count ?? item.payload?.deficiencies?.reduce((acc, d) => acc + (d.photo_ids?.length || 0), 0) ?? 0;
             const isDownloading = downloadingId === item.id;
 
-            // Format created date nicely
-            const dateStr = item.created_at 
-              ? new Date(item.created_at).toLocaleString(undefined, {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit'
-                })
-              : 'Recently';
+            // Format created date nicely using WAT explicitly
+            const dateStr = item.created_at ? formatWatDateTime(item.created_at) : 'Recently';
+
 
             return (
               <div 

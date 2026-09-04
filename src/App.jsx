@@ -5,6 +5,7 @@ import MetadataForm from './components/MetadataForm.jsx';
 import PunchList from './components/PunchList.jsx';
 import OutboxList from './components/OutboxList.jsx';
 import { loadActiveDraft, saveDraft, getAllOutboxItems, getOutboxItem } from './services/db.js';
+import { getWatDateString } from './utils/date.js';
 import { 
   initAutoSyncListener, 
   queueInspectionForSubmission, 
@@ -20,7 +21,7 @@ export default function App() {
     estate_name: '',
     unit_number: '',
     inspector_name: '',
-    inspection_date: new Date().toISOString().split('T')[0]
+    inspection_date: getWatDateString()
   });
 
   const [deficiencies, setDeficiencies] = useState([]);
@@ -35,6 +36,7 @@ export default function App() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [lastSubmittedId, setLastSubmittedId] = useState(null);
   const [lastSubmittedPdfUrl, setLastSubmittedPdfUrl] = useState(null);
+  const [saveStatus, setSaveStatus] = useState('saved'); // 'saved' | 'saving'
 
   const refreshOutbox = async () => {
     try {
@@ -55,7 +57,7 @@ export default function App() {
           estate_name: draft.estate_name || '',
           unit_number: draft.unit_number || '',
           inspector_name: draft.inspector_name || '',
-          inspection_date: draft.inspection_date || new Date().toISOString().split('T')[0]
+          inspection_date: draft.inspection_date || getWatDateString()
         });
         setDeficiencies(draft.deficiencies || []);
       }
@@ -75,10 +77,18 @@ export default function App() {
 
   useEffect(() => {
     if (activeTab === 'new') {
-      saveDraft({
-        ...metadata,
-        deficiencies
-      }).catch(err => console.error('Error auto-saving draft to IndexedDB:', err));
+      setSaveStatus('saving');
+      const timer = setTimeout(() => {
+        saveDraft({
+          ...metadata,
+          deficiencies
+        }).then(() => setSaveStatus('saved'))
+          .catch(err => {
+            console.error('Error auto-saving draft to IndexedDB:', err);
+            setSaveStatus('saved');
+          });
+      }, 800);
+      return () => clearTimeout(timer);
     }
   }, [metadata, deficiencies, activeTab]);
 
@@ -143,7 +153,7 @@ export default function App() {
         estate_name: '',
         unit_number: '',
         inspector_name: metadata.inspector_name,
-        inspection_date: new Date().toISOString().split('T')[0]
+        inspection_date: getWatDateString()
       });
       setDeficiencies([]);
       setPhotosList([]);
@@ -177,10 +187,11 @@ export default function App() {
         isSyncing={isSyncing}
         pendingCount={pendingCount}
         onManualSync={handleManualSync}
+        saveStatus={saveStatus}
       />
 
       <main className="max-w-xl w-full mx-auto p-4 space-y-4 flex-1">
-        {/* Flybird-Style Top Tab Switcher */}
+        {/* Top Tab Switcher */}
         <div className="grid grid-cols-2 p-1 bg-slate-900 border border-slate-800 rounded-2xl shadow-inner">
           <button
             type="button"
@@ -251,8 +262,8 @@ export default function App() {
 
         {/* App Version & Build Footer */}
         <footer className="pt-6 pb-2 text-center text-[11px] text-slate-500 font-mono space-y-1">
-          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.8</span> (Cache: v8)</div>
-          <div className="text-[10px] text-slate-600">Flybird Outbox & Direct Mobile PDF Downloader</div>
+          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.9</span> (Cache: v9)</div>
+          <div className="text-[10px] text-slate-600">Property Inspection Suite</div>
         </footer>
       </main>
 
