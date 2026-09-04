@@ -1,4 +1,5 @@
 import Dexie from 'dexie';
+import { getWatDateString } from '../utils/date.js';
 
 export class PropertyInspectionDatabase extends Dexie {
   constructor() {
@@ -19,8 +20,9 @@ export async function saveDraft(draftData) {
     estate_name: draftData.estate_name || '',
     unit_number: draftData.unit_number || '',
     inspector_name: draftData.inspector_name || '',
-    inspection_date: draftData.inspection_date || new Date().toISOString().split('T')[0],
+    inspection_date: draftData.inspection_date || getWatDateString(),
     deficiencies: draftData.deficiencies || [],
+    active_defect: draftData.active_defect || null,
     updated_at: new Date().toISOString()
   };
   await db.drafts.put(draft);
@@ -36,8 +38,9 @@ export async function loadActiveDraft() {
     estate_name: '',
     unit_number: '',
     inspector_name: '',
-    inspection_date: new Date().toISOString().split('T')[0],
+    inspection_date: getWatDateString(),
     deficiencies: [],
+    active_defect: null,
     updated_at: new Date().toISOString()
   };
   await db.drafts.put(defaultDraft);

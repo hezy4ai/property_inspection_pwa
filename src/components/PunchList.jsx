@@ -23,7 +23,7 @@ const DEFAULT_AREAS = [
   'Entrance / Hallway'
 ];
 
-export default function PunchList({ deficiencies = [], onChange, photoMap = {}, onAddPhoto, onDeletePhoto }) {
+export default function PunchList({ deficiencies = [], onChange, activeDefect, onActiveDefectChange, photoMap = {}, onAddPhoto, onDeletePhoto }) {
   const [selectedArea, setSelectedArea] = useState('Living Room');
   const [customArea, setCustomArea] = useState('');
   const [description, setDescription] = useState('');
@@ -34,10 +34,36 @@ export default function PunchList({ deficiencies = [], onChange, photoMap = {}, 
   const [speechSupported, setSpeechSupported] = useState(true);
   const recognizerRef = useRef(null);
   const initialTextRef = useRef('');
+  const hasLoadedDraft = useRef(false);
 
   useEffect(() => {
     setSpeechSupported(isSpeechRecognitionSupported());
   }, []);
+
+  // Hydrate from db active defect exactly once
+  useEffect(() => {
+    if (activeDefect && !hasLoadedDraft.current) {
+      setSelectedArea(activeDefect.selectedArea || 'Living Room');
+      setCustomArea(activeDefect.customArea || '');
+      setDescription(activeDefect.description || '');
+      setSeverity(activeDefect.severity || 'MODERATE');
+      setDraftPhotos(activeDefect.draftPhotos || []);
+      hasLoadedDraft.current = true;
+    }
+  }, [activeDefect]);
+
+  // Sync back to App.jsx for auto-save
+  useEffect(() => {
+    if (onActiveDefectChange) {
+      onActiveDefectChange({
+        selectedArea,
+        customArea,
+        description,
+        severity,
+        draftPhotos
+      });
+    }
+  }, [selectedArea, customArea, description, severity, draftPhotos, onActiveDefectChange]);
 
   const toggleVoiceDictation = () => {
     if (!speechSupported) {
