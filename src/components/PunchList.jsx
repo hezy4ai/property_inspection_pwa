@@ -231,14 +231,18 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
               key={lvl}
               type="button"
               onClick={() => setSeverity(lvl)}
-              className={`px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide transition-all ${
+              className={`px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide border transition-all ${
                 severity === lvl
                   ? lvl === 'CRITICAL'
-                    ? 'bg-app-status-critical/10 text-app-status-critical border border-app-status-critical/20'
+                    ? 'bg-app-status-critical border-app-status-critical text-white'
                     : lvl === 'MODERATE'
-                    ? 'bg-app-status-warning/10 text-app-status-warning border border-app-status-warning/20'
-                    : 'bg-app-status-minor/10 text-app-text-primary border border-app-status-minor/30'
-                  : 'bg-white text-app-text-secondary border border-app-border'
+                    ? 'bg-app-status-moderate border-app-status-moderate text-white'
+                    : 'bg-app-status-minor border-app-status-minor text-white'
+                  : lvl === 'CRITICAL'
+                  ? 'bg-white border-app-status-critical text-app-status-critical'
+                  : lvl === 'MODERATE'
+                  ? 'bg-white border-app-status-moderate text-app-status-moderate'
+                  : 'bg-white border-app-status-minor text-app-status-minor'
               }`}
             >
               {lvl}
@@ -262,7 +266,7 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
                 }`}
               >
                 {isRecording ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5 text-app-brand-primary" />}
-                <span>{isRecording ? 'Listening...' : 'Voice Dictate'}</span>
+                <span className={!isRecording ? 'text-app-brand-primary' : ''}>{isRecording ? 'Listening...' : 'Voice Dictate'}</span>
               </button>
             )}
           </div>
@@ -315,10 +319,10 @@ export default function PunchList({ deficiencies = [], onChange, activeDefect, o
                   <span
                     className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                       item.severity === 'CRITICAL'
-                        ? 'bg-app-status-critical/10 text-app-status-critical'
+                        ? 'bg-app-status-critical/10 text-app-status-critical border border-app-status-critical/20'
                         : item.severity === 'MODERATE'
-                        ? 'bg-app-status-warning/10 text-app-status-warning'
-                        : 'bg-app-status-minor/10 text-app-text-primary'
+                        ? 'bg-app-status-moderate/10 text-app-status-moderate border border-app-status-moderate/20'
+                        : 'bg-app-status-minor/10 text-app-status-minor border border-app-status-minor/20'
                     }`}
                   >
                     {item.severity}
