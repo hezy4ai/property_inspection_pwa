@@ -236,7 +236,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 pb-28">
+    <div className="min-h-screen flex flex-col bg-app-bg text-app-text-primary pb-28">
       {/* Top Header */}
       <SyncBanner
         isOnline={isOnline}
@@ -248,14 +248,14 @@ export default function App() {
 
       <main className="max-w-xl w-full mx-auto p-4 space-y-4 flex-1">
         {/* Top Tab Switcher */}
-        <div className="grid grid-cols-2 p-1 bg-slate-900 border border-slate-800 rounded-2xl shadow-inner">
+        <div className="grid grid-cols-2 p-1 bg-app-card border border-app-border rounded-2xl shadow-sm">
           <button
             type="button"
             onClick={() => setActiveTab('new')}
             className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'new'
-                ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                ? 'bg-app-brand-primary text-white shadow-md shadow-app-brand-primary/20'
+                : 'text-app-text-secondary hover:text-app-text-primary hover:bg-black/5'
             }`}
           >
             <PlusCircle className="w-3.5 h-3.5" />
@@ -270,8 +270,8 @@ export default function App() {
             }}
             className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'outbox'
-                ? 'bg-slate-800 text-white border border-slate-700 shadow-md'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                ? 'bg-app-brand-secondary text-app-text-primary border-app-brand-secondary shadow-md'
+                : 'text-app-text-secondary hover:text-app-text-primary hover:bg-black/5'
             }`}
           >
             <Inbox className="w-3.5 h-3.5" />
@@ -283,9 +283,9 @@ export default function App() {
         {activeTab === 'new' && (
           <div className="space-y-4">
             {!isOnline && (
-              <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 flex items-start gap-2.5">
-                <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <div className="text-xs text-amber-200">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div className="text-xs text-amber-800">
                   <span className="font-semibold">Offline Mode Active:</span> All photos, voice logs, and inspection data are stored securely in local IndexedDB. Sync will occur automatically when online.
                 </div>
               </div>
@@ -319,26 +319,26 @@ export default function App() {
         )}
 
         {/* App Version & Build Footer */}
-        <footer className="pt-6 pb-2 text-center text-[11px] text-slate-500 font-mono space-y-1">
-          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.1.1</span> (Cache: v12)</div>
-          <div className="text-[10px] text-slate-600">Property Inspection Suite</div>
+        <footer className="pt-6 pb-2 text-center text-[11px] text-app-text-secondary font-mono space-y-1">
+          <div>InspectPWA <span className="text-app-brand-primary font-semibold">v1.1.2</span> (Cache: v13)</div>
+          <div className="text-[10px] opacity-75">Property Inspection Suite</div>
         </footer>
       </main>
 
       {/* Bottom Sticky Action Bar */}
-      <div className="fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 p-4 safe-bottom z-30 shadow-2xl">
+      <div className="fixed bottom-0 inset-x-0 bg-app-card/95 backdrop-blur-lg border-t border-app-border p-4 safe-bottom z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <div className="max-w-xl mx-auto flex items-center gap-3">
           {activeTab === 'new' ? (
             <>
-              <div className="text-xs text-slate-400 hidden sm:block">
-                <span className="font-semibold text-white">{deficiencies.length}</span> Defect(s) ready
+              <div className="text-xs text-app-text-secondary hidden sm:block">
+                <span className="font-semibold text-app-text-primary">{deficiencies.length}</span> Defect(s) ready
               </div>
 
               <button
                 type="button"
                 onClick={handleSubmitInspection}
                 disabled={isSubmitting || !metadata.estate_name.trim() || !metadata.unit_number.trim()}
-                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 active:scale-[0.98] text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-sky-600/30 disabled:opacity-40 disabled:pointer-events-none transition-all text-sm"
+                className="flex-1 flex items-center justify-center gap-2 bg-app-brand-primary hover:bg-app-brand-primary/90 active:scale-[0.98] text-white font-bold py-3.5 px-6 rounded-xl shadow-lg disabled:opacity-40 disabled:pointer-events-none transition-all text-sm"
               >
                 {isSubmitting ? (
                   <>
@@ -358,16 +358,16 @@ export default function App() {
               type="button"
               onClick={handleManualSync}
               disabled={!isOnline || isSyncing || pendingCount === 0}
-              className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700/90 active:scale-[0.98] border border-slate-700/80 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg disabled:opacity-40 disabled:pointer-events-none transition-all text-sm"
+              className="w-full flex items-center justify-center gap-2 bg-app-brand-secondary hover:bg-app-brand-secondary/90 active:scale-[0.98] border border-app-brand-secondary text-app-text-primary font-bold py-3.5 px-6 rounded-xl shadow-lg disabled:opacity-40 disabled:pointer-events-none transition-all text-sm"
             >
               {isSyncing ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin text-sky-400" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-app-text-primary" />
                   <span>Syncing {pendingCount} queued inspection(s)...</span>
                 </>
               ) : (
                 <>
-                  <RefreshCw className="w-4 h-4 text-sky-400" />
+                  <RefreshCw className="w-4 h-4 text-app-text-primary" />
                   <span>Sync now {pendingCount > 0 ? `(${pendingCount} pending)` : '(All up to date)'}</span>
                 </>
               )}
@@ -378,29 +378,29 @@ export default function App() {
 
       {/* Submission Success Modal */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-500/30">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-app-card border border-app-border rounded-2xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-14 h-14 bg-emerald-50 text-app-status-success rounded-full flex items-center justify-center mx-auto border border-emerald-100">
               <CheckCircle className="w-8 h-8" />
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-white">Inspection Submitted!</h3>
-              <p className="text-xs text-slate-400 mt-1">
+              <h3 className="text-lg font-bold text-app-text-primary">Inspection Submitted!</h3>
+              <p className="text-xs text-app-text-secondary mt-1">
                 {isOnline 
                   ? 'All photos and the official PDF certificate have been compiled and synced to Supabase.' 
                   : 'Inspection saved safely to local IndexedDB. Photos and PDF will sync automatically once network is restored.'}
               </p>
             </div>
 
-            <div className="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 text-left text-xs space-y-1.5">
-              <div className="flex justify-between text-slate-400">
+            <div className="p-3 bg-black/5 rounded-xl border border-app-border text-left text-xs space-y-1.5">
+              <div className="flex justify-between text-app-text-secondary">
                 <span>Inspection ID:</span>
-                <span className="font-mono text-slate-200">{lastSubmittedId?.slice(0, 14)}...</span>
+                <span className="font-mono text-app-text-primary">{lastSubmittedId?.slice(0, 14)}...</span>
               </div>
-              <div className="flex justify-between text-slate-400">
+              <div className="flex justify-between text-app-text-secondary">
                 <span>Storage Status:</span>
-                <span className="text-emerald-400 font-semibold">Saved in Outbox</span>
+                <span className="text-app-status-success font-semibold">Saved in Outbox</span>
               </div>
             </div>
 
@@ -410,7 +410,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => downloadPdfToDevice(lastSubmittedPdfUrl, `Inspection_${lastSubmittedId}`)}
-                    className="py-3 px-2 rounded-xl bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white font-semibold text-xs shadow-md shadow-sky-600/30 flex items-center justify-center gap-1.5 transition-all"
+                    className="py-3 px-2 rounded-xl bg-app-brand-primary hover:bg-app-brand-primary/90 text-white font-semibold text-xs shadow-md flex items-center justify-center gap-1.5 transition-all"
                   >
                     <span>↓ Download PDF</span>
                   </button>
@@ -418,7 +418,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => shareOrOpenPdf(lastSubmittedPdfUrl, 'Inspection Report')}
-                    className="py-3 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 hover:text-sky-200 font-semibold text-xs border border-sky-500/30 flex items-center justify-center gap-1.5 transition-all"
+                    className="py-3 px-2 rounded-xl bg-white hover:bg-gray-50 text-app-brand-primary font-semibold text-xs border border-app-border flex items-center justify-center gap-1.5 transition-all"
                   >
                     <span>Share / Print</span>
                   </button>
@@ -431,7 +431,7 @@ export default function App() {
                   setShowSuccessModal(false);
                   setActiveTab('outbox');
                 }}
-                className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs border border-slate-700/60 transition-all flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 rounded-xl bg-white hover:bg-gray-50 text-app-text-primary font-semibold text-xs border border-app-border transition-all flex items-center justify-center gap-1.5"
               >
                 <Inbox className="w-3.5 h-3.5" />
                 <span>Go to Outbox</span>
@@ -440,7 +440,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setShowSuccessModal(false)}
-                className="w-full py-2 rounded-xl text-slate-500 hover:text-slate-400 text-xs font-medium transition-all"
+                className="w-full py-2 rounded-xl text-app-text-secondary hover:text-app-text-primary text-xs font-medium transition-all"
               >
                 Start Next Inspection
               </button>
