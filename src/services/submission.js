@@ -34,7 +34,8 @@ export async function queueInspectionForSubmission(inspectionData, photoBlobs = 
       inspection_id: inspectionId,
       deficiency_id: photo.deficiency_id,
       blob: photo.blob,
-      mime_type: photo.mime_type || 'image/webp'
+      buffer: photo.buffer,
+      mime_type: photo.mimeType || photo.mime_type || 'image/webp'
     });
   }
 
@@ -100,9 +101,17 @@ export async function processOutboxQueue(onStatusChange) {
           const fileExt = photo.mime_type.includes('png') ? 'png' : photo.mime_type.includes('jpeg') ? 'jpg' : 'webp';
           const filePath = `photos/${datePrefix}/${item.id}/${photo.id}.${fileExt}`;
 
+          // Ensure we have a valid Blob/File object (buffer is robust across IndexedDB rehydration)
+          let uploadBody = photo.blob;
+          if (photo.buffer) {
+            uploadBody = new File([photo.buffer], `${photo.id}.${fileExt}`, { type: photo.mime_type || 'image/webp' });
+          } else if (!(uploadBody instanceof Blob)) {
+            console.warn(`[Sync Engine] Warning: no valid buffer or blob for ${photo.id}`);
+          }
+
           const { error: uploadError } = await supabase.storage
             .from(STORAGE_BUCKET)
-            .upload(filePath, photo.blob, {
+            .upload(filePath, uploadBody, {
               contentType: photo.mime_type || 'image/webp',
               upsert: true
             });

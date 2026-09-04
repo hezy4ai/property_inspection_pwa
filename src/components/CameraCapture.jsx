@@ -50,12 +50,13 @@ export default function CameraCapture({ photos = [], onAddPhoto, onDeletePhoto }
     setIsCapturing(true);
 
     try {
-      const { blob, mimeType, width, height, previewUrl } = await captureFrameAsBlob(videoRef.current);
+      const { blob, buffer, mimeType, width, height, previewUrl } = await captureFrameAsBlob(videoRef.current);
       const photoId = `photo_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
 
       onAddPhoto({
         id: photoId,
         blob,
+        buffer,
         mimeType,
         width,
         height,
@@ -76,12 +77,13 @@ export default function CameraCapture({ photos = [], onAddPhoto, onDeletePhoto }
 
     for (const file of Array.from(files)) {
       try {
-        const { blob, mimeType, previewUrl } = await processFileToBlob(file);
+        const { blob, buffer, mimeType, previewUrl } = await processFileToBlob(file);
         const photoId = `photo_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
 
         onAddPhoto({
           id: photoId,
           blob,
+          buffer,
           mimeType,
           previewUrl
         });
