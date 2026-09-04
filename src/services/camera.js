@@ -55,13 +55,19 @@ export async function captureFrameAsBlob(videoElement, quality = 0.92) {
                 reject(new Error('Failed to generate image blob from camera frame.'));
                 return;
               }
-              resolve({
-                blob: jpegBlob,
-                mimeType: 'image/jpeg',
-                width: canvas.width,
-                height: canvas.height,
-                previewUrl: URL.createObjectURL(jpegBlob)
-              });
+              const reader = new FileReader();
+              reader.onload = () => {
+                resolve({
+                  blob: jpegBlob,
+                  buffer: reader.result,
+                  mimeType: 'image/jpeg',
+                  width: canvas.width,
+                  height: canvas.height,
+                  previewUrl: URL.createObjectURL(jpegBlob)
+                });
+              };
+              reader.onerror = reject;
+              reader.readAsArrayBuffer(jpegBlob);
             },
             'image/jpeg',
             quality
@@ -69,13 +75,19 @@ export async function captureFrameAsBlob(videoElement, quality = 0.92) {
           return;
         }
 
-        resolve({
-          blob,
-          mimeType,
-          width: canvas.width,
-          height: canvas.height,
-          previewUrl: URL.createObjectURL(blob)
-        });
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve({
+            blob,
+            buffer: reader.result,
+            mimeType,
+            width: canvas.width,
+            height: canvas.height,
+            previewUrl: URL.createObjectURL(blob)
+          });
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(blob);
       },
       mimeType,
       quality
@@ -90,6 +102,7 @@ export async function processFileToBlob(file) {
       const blob = new Blob([reader.result], { type: file.type });
       resolve({
         blob,
+        buffer: reader.result,
         mimeType: file.type,
         previewUrl: URL.createObjectURL(blob)
       });

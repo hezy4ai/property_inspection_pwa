@@ -12,7 +12,7 @@ export default function SyncBanner({ isOnline, isSyncing, pendingCount, onManual
           <div>
             <div className="flex items-center gap-1.5">
               <h1 className="text-sm font-semibold text-white leading-tight">InspectPWA</h1>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-sky-400 border border-slate-700">v1.0.10</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-sky-400 border border-slate-700">v1.1.0</span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <p className="text-[11px] text-slate-400">Field Punch-List</p>

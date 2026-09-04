@@ -61,8 +61,39 @@ export default function App() {
           inspection_date: draft.inspection_date || getWatDateString()
         });
         setDeficiencies(draft.deficiencies || []);
+        
+        let loadedPhotosList = [];
+        if (draft.photos_list && draft.photos_list.length > 0) {
+          loadedPhotosList = draft.photos_list.map(photo => {
+             const blob = new Blob([photo.buffer], { type: photo.mimeType || photo.mime_type || 'image/webp' });
+             return {
+               ...photo,
+               blob,
+               previewUrl: URL.createObjectURL(blob)
+             };
+          });
+          setPhotosList(loadedPhotosList);
+          const map = {};
+          loadedPhotosList.forEach(p => { map[p.id] = p; });
+          setPhotoMap(map);
+        }
+
         if (draft.active_defect) {
-          setActiveDefect(draft.active_defect);
+          const hydratedActiveDefect = { ...draft.active_defect };
+          if (hydratedActiveDefect.draftPhotos) {
+             hydratedActiveDefect.draftPhotos = hydratedActiveDefect.draftPhotos.map(photo => {
+                if (photo.buffer && !photo.previewUrl) {
+                   const blob = new Blob([photo.buffer], { type: photo.mimeType || photo.mime_type || 'image/webp' });
+                   return {
+                     ...photo,
+                     blob,
+                     previewUrl: URL.createObjectURL(blob)
+                   };
+                }
+                return photo;
+             });
+          }
+          setActiveDefect(hydratedActiveDefect);
         }
       }
 
@@ -86,7 +117,24 @@ export default function App() {
         saveDraft({
           ...metadata,
           deficiencies,
-          active_defect: activeDefect
+          active_defect: activeDefect ? {
+            ...activeDefect,
+            draftPhotos: activeDefect.draftPhotos ? activeDefect.draftPhotos.map(p => ({
+              id: p.id,
+              buffer: p.buffer,
+              mimeType: p.mimeType || p.mime_type || 'image/webp',
+              width: p.width,
+              height: p.height
+            })) : []
+          } : null,
+          photos_list: photosList.map(p => ({
+            id: p.id,
+            buffer: p.buffer,
+            mimeType: p.mimeType || p.mime_type || 'image/webp',
+            width: p.width,
+            height: p.height,
+            deficiency_id: p.deficiency_id
+          }))
         }).then(() => setSaveStatus('saved'))
           .catch(err => {
             console.error('Error auto-saving draft to IndexedDB:', err);
@@ -95,7 +143,7 @@ export default function App() {
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [metadata, deficiencies, activeDefect, activeTab]);
+  }, [metadata, deficiencies, activeDefect, photosList, activeTab]);
 
   const handleAddPhoto = (photo) => {
     setPhotosList((prev) => [...prev, photo]);
@@ -272,7 +320,7 @@ export default function App() {
 
         {/* App Version & Build Footer */}
         <footer className="pt-6 pb-2 text-center text-[11px] text-slate-500 font-mono space-y-1">
-          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.0.10</span> (Cache: v10)</div>
+          <div>InspectPWA <span className="text-sky-400 font-semibold">v1.1.0</span> (Cache: v11)</div>
           <div className="text-[10px] text-slate-600">Property Inspection Suite</div>
         </footer>
       </main>
