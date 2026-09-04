@@ -53,12 +53,13 @@ export async function clearActiveDraft() {
   await db.drafts.delete('active_draft');
 }
 
-export async function storePhotoBlob({ id, inspection_id, deficiency_id, blob, mime_type = 'image/webp' }) {
+export async function storePhotoBlob({ id, inspection_id, deficiency_id, blob, buffer, mime_type = 'image/webp' }) {
   await db.photoBlobs.put({
     id,
     inspection_id,
     deficiency_id,
     blob,
+    buffer,
     mime_type,
     created_at: new Date().toISOString()
   });
