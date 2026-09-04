@@ -1,7 +1,7 @@
 import React from 'react';
-import { Wifi, WifiOff, RefreshCw, AlertCircle } from 'lucide-react';
+import { Wifi, WifiOff, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
 
-export default function SyncBanner({ isOnline, isSyncing, pendingCount, onManualSync }) {
+export default function SyncBanner({ isOnline, isSyncing, pendingCount, onManualSync, saveStatus }) {
   return (
     <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
       <div className="max-w-xl mx-auto flex items-center justify-between">
@@ -12,9 +12,17 @@ export default function SyncBanner({ isOnline, isSyncing, pendingCount, onManual
           <div>
             <div className="flex items-center gap-1.5">
               <h1 className="text-sm font-semibold text-white leading-tight">InspectPWA</h1>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-sky-400 border border-slate-700">v1.0.8</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-sky-400 border border-slate-700">v1.0.9</span>
             </div>
-            <p className="text-[11px] text-slate-400">Field Punch-List</p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <p className="text-[11px] text-slate-400">Field Punch-List</p>
+              {saveStatus === 'saving' && (
+                <span className="text-[10px] text-amber-400/80 italic flex items-center gap-1"><RefreshCw className="w-2.5 h-2.5 animate-spin"/> Saving...</span>
+              )}
+              {saveStatus === 'saved' && (
+                <span className="text-[10px] text-slate-500/80 italic flex items-center gap-1"><CheckCircle className="w-2.5 h-2.5"/> Saved locally</span>
+              )}
+            </div>
           </div>
         </div>
 

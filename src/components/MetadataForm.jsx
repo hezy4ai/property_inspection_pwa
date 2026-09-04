@@ -1,5 +1,6 @@
 import React from 'react';
 import { Building2, Hash, UserCheck, Calendar } from 'lucide-react';
+import { getWatDateString } from '../utils/date.js';
 
 export default function MetadataForm({ metadata, onChange }) {
   const handleChange = (field, value) => {
@@ -78,7 +79,7 @@ export default function MetadataForm({ metadata, onChange }) {
             </div>
             <input
               type="date"
-              value={metadata.inspection_date || new Date().toISOString().split('T')[0]}
+              value={metadata.inspection_date || getWatDateString()}
               onChange={(e) => handleChange('inspection_date', e.target.value)}
               className="w-full bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl pl-9 pr-3 py-2.5 text-sm text-white outline-none transition-all"
             />
