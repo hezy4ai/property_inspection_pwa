@@ -23,6 +23,7 @@ export async function saveDraft(draftData) {
     inspection_date: draftData.inspection_date || getWatDateString(),
     deficiencies: draftData.deficiencies || [],
     active_defect: draftData.active_defect || null,
+    photos_list: draftData.photos_list || [],
     updated_at: new Date().toISOString()
   };
   await db.drafts.put(draft);
@@ -41,6 +42,7 @@ export async function loadActiveDraft() {
     inspection_date: getWatDateString(),
     deficiencies: [],
     active_defect: null,
+    photos_list: [],
     updated_at: new Date().toISOString()
   };
   await db.drafts.put(defaultDraft);
